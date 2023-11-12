@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+/usr/share/elasticsearch/bin/elasticsearch -E discovery.type=single-node -E xpack.security.enabled=false > /dev/null 2>&1 &
