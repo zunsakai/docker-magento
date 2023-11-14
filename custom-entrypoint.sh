@@ -13,6 +13,10 @@ if [ ! $PORT ]; then
     PORT=$DEFAULT_PORT
 fi
 
+if [ ! $HOST ]; then
+    HOST="localhost"
+fi
+
 wait_for_elasticsearch() {
     local start_time=$(date +%s)
     local end_time=$((start_time + 120))
@@ -57,27 +61,26 @@ $PHP_FPM_CLI -D -R > /dev/null 2>&1
 echo -e "\e[32mok\e[0m"
 
 # Testing
-if [[ "$PORT" != "$DEFAULT_PORT" ]]; then
-    mysql -u root -proot magento_db -e "UPDATE core_config_data SET value = 'http://localhost:$PORT/' WHERE path = 'web/unsecure/base_url';" > /dev/null 2>&1
-    bm c:f > /dev/null 2>&1
-fi
-curl -s http://localhost:$PORT | grep -q "magento-init"
+curl -s http://localhost:$DEFAULT_PORT | grep -q "magento-init"
 
 if [ $? -eq 0 ]; then
 
-    if [ $HOST ]; then
+    if [[ "$HOST" != "localhost" || "$PORT" != "$DEFAULT_PORT" ]]; then
         # Update host
         echo -n "Update base url..."
         mysql -u root -proot magento_db -e "UPDATE core_config_data SET value = 'http://$HOST:$PORT/' WHERE path = 'web/unsecure/base_url';" > /dev/null 2>&1
-        bm c:f > /dev/null 2>&1
         echo -e "\e[32mok\e[0m"
+
         # Restart nginx
         echo "listen $PORT default_server; server_name $HOST;" > /etc/nginx/host.conf
         echo -n "Restart nginx..."
         service nginx restart > /dev/null 2>&1
         echo -e "\e[32mok\e[0m"
-    else
-        HOST="localhost"
+
+        # Flush cache
+        echo -n "Flush cache..."
+        bin/magento cache:flush > /dev/null 2>&1
+        echo -e "\e[32mok\e[0m"
     fi
 
     echo -e "\n\e[32mMagento$VERSION is ready to use.\e[0m"
