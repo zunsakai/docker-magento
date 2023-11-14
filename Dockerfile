@@ -21,7 +21,7 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 
 # Config PORT
 RUN . /root/magento_config \
-    && echo "listen $PORT default_server;" > /etc/nginx/listen_default.conf
+    && echo "listen $DEFAULT_PORT default_server; server_name localhost;" > /etc/nginx/host.conf
 
 # Install magento
 RUN . /root/magento_config \
@@ -36,7 +36,7 @@ RUN . /root/magento_config \
     && service $PHP_FPM_SERVICE status \
     && curl http://localhost:9200 \
     && php -d memory_limit=-1 bin/magento setup:install \
-        --base-url=http://localhost:$PORT \
+        --base-url=http://localhost:$DEFAULT_PORT \
         --db-host=127.0.0.1 \
         --db-name=magento_db \
         --db-user=magento \
