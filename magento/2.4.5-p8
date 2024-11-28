@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export MAGENTO_URL=https://github.com/magento/magento2/archive/refs/tags/2.4.5-p8.zip
+export SAMPLE_DATA_URL=https://github.com/magento/magento2-sample-data/archive/refs/tags/2.4.5-p8.zip
+export DEFAULT_PORT=2458
+export PHP_FPM_SERVICE=php8.1-fpm
+export PHP_FPM_CLI=php-fpm8.1

@@ -1,4 +1,5 @@
-FROM zunsakai/base:php8.1-mysql8-elasticsearch7-nginx
+ARG PHP_VERSION
+FROM zunsakai/base:php${PHP_VERSION}-mysql8-elasticsearch7-nginx
 
 USER root
 
@@ -51,7 +52,13 @@ RUN . /root/magento_config \
         --search-engine=elasticsearch7 \
         --elasticsearch-host=127.0.0.1 \
         --elasticsearch-port=9200 \
-        --cleanup-database
+        --cleanup-database \
+    && php bin/magento config:set admin/security/password_is_forced 0 \
+    && php bin/magento config:set admin/security/password_lifetime 31536000 \
+    && php bin/magento config:set admin/security/session_lifetime 31536000 \
+    && php bin/magento config:set admin/security/admin_account_sharing 1 \
+    && php bin/magento config:set admin/security/use_form_key 0 \
+    && php bin/magento config:set admin/security/lockout_failures 100
 
 # Add n98 command
 RUN wget -O /var/www/html/n98-magerun2.phar https://files.magerun.net/n98-magerun2-latest.phar
