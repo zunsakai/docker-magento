@@ -24,6 +24,9 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 RUN . /root/magento_config \
     && echo "listen $DEFAULT_PORT default_server; server_name localhost;" > /etc/nginx/host.conf
 
+# For Magento 2.4.6-p1
+# RUN wget -O /var/www/html/nginx.conf.sample https://raw.githubusercontent.com/magento/magento2/refs/tags/2.4.6/nginx.conf.sample
+
 # Install magento
 RUN . /root/magento_config \
     && su elasticsearch -c 'start_elasticsearch' \
